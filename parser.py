@@ -8,8 +8,6 @@ import sys
 
 from enum import Enum
 
-source = sys.argv[1]
-
 class CharClass(Enum):
     EOF        = 1
     LETTER     = 2
