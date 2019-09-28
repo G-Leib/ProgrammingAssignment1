@@ -1,0 +1,54 @@
+prog -> program i block .
+block -> var_dec_sec comp_stat
+block -> comp_stat
+var_dec_sec -> var var_dec'
+var_dec' -> var_dec ; var_dec'
+var_dec' -> var_dec
+assignment -> i := expr
+read_stat -> read i
+write_stat -> write i 
+write_stat -> write l
+struct_stat -> conditional 
+struct_stat ->  while_loop 
+struct_stat ->  comp_stat
+conditional -> if bool_expr then statement conditional'
+conditional' -> else statement
+conditional' -> ''
+while_loop -> while bool_expr do statement
+expr -> arithmetic_expr 
+expr -> bool_expr
+arithmetic_expr -> arithmetic_expr + term
+arithmetic_expr -> arithmetic_expr - term 
+arithmetic_expr -> term
+term -> term * factor 
+term -> factor
+factor -> i 
+factor -> int_l 
+l -> int_l 
+l -> bool_l
+var_dec -> i' : type
+i' -> i i'
+i' -> i
+type -> Integer 
+type -> Boolean
+comp_stat -> begin statement' end
+statement' -> statement ; statment'
+statement' -> statement
+statement -> simple_stat 
+statement -> struct_stat
+simple_stat -> assignment 
+simple_stat -> read_stat
+simple_stat -> write_stat
+bool_expr -> bool_l 
+bool_expr -> arithmetic_expr > arithmetic_expr
+bool_expr -> arithmetic_expr >= arithmetic_expr
+bool_expr -> arithmetic_expr = arithmetic_expr
+bool_expr -> arithmetic_expr <= arithmetic_expr
+bool_expr -> arithmetic_expr < arithmetic_expr
+bool_l -> true 
+bool_l -> false
+
+=====================================================================
+
+i -> <letter> { <letter> | <digit> }
+int_l -> <digit> { <digit> }
