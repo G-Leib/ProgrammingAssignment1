@@ -47,8 +47,3 @@ bool_expr -> arithmetic_expr <= arithmetic_expr
 bool_expr -> arithmetic_expr < arithmetic_expr
 bool_l -> true 
 bool_l -> false
-
-=====================================================================
-
-i -> <letter> { <letter> | <digit> }
-int_l -> <digit> { <digit> }

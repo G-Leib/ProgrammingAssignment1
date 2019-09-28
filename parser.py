@@ -78,7 +78,8 @@ class Token(Enum):
     VAR = 27
     WHILE = 28
     WRITE = 29
-    OTHER = 30
+    DIVISION = 30
+    EOF = 31
 
 lookupToken = {
     "$"         : Token.EOF,
@@ -295,6 +296,9 @@ def parse(input, grammar, actions, gotos):
 
             trees.append(newTree)
 
+        elif action == 'acc':
+            return True
+
         else:
             production = grammar[0]
             lhs = getLHS(production)
@@ -311,20 +315,39 @@ def parse(input, grammar, actions, gotos):
 if __name__ == "__main__":
 
     
-    if len(sys.argv) != 2:
-        raise ValueError("Missing source file")
-    source = open(sys.argv[1], "rt")
-    if not source:
-        raise IOError("Couldn't open source file")
-    input = source.read()
-    source.close()
-    output = []
+    # if len(sys.argv) != 2:
+    #     raise ValueError("Missing source file")
+    # source = open(sys.argv[1], "rt")
+    # if not source:
+    #     raise IOError("Couldn't open source file")
+    # input = source.read()
+    # source.close()
+    # output = []
 
-    while True:
-        input, lexeme, token = lex(input)
-        if lexeme == None:
-            break
-        output.append((lexeme, token))
+    input = open("grammar.txt", "rt")
+    grammar = loadGrammar(input)
+    #printGrammar(grammar)
+    input.close()
 
-    for (lexeme, token) in output:
-        print(lexeme, token)
+    input = open("slr_table.txt", "rt")
+    actions, gotos = loadTable(input)
+    #printActions(actions)
+    #printGotos(gotos)
+    input.close()
+
+    input = [ 'program', 'i', 'begin', 'write', 'i', 'end', '.', '$' ]
+
+    if parse(input, grammar, actions, gotos):
+        print("Input is syntactically correct!")
+    else:
+        print("There is a syntax error!")
+
+    # while True:
+    #     input, lexeme, token = lex(input)
+    #     if lexeme == None:
+    #         break
+    #     output.append((lexeme, token))
+
+
+    # for (lexeme, token) in output:
+    #     print(lexeme, token)
