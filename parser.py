@@ -5,7 +5,6 @@
 #===========================================================
 
 import sys
-
 from enum import Enum
 
 class CharClass(Enum):
@@ -14,9 +13,8 @@ class CharClass(Enum):
     DIGIT      = 3
     OPERATOR   = 4
     PUNCTUATOR = 5
-    QUOTE      = 6
-    BLANK      = 7
-    OTHER      = 8
+    BLANK      = 6
+    OTHER      = 7
 
 def getChar(input):
     if len(input) == 0:
@@ -26,11 +24,9 @@ def getChar(input):
         return (c, CharClass.LETTER)
     if c.isdigit():
         return (c, CharClass.DIGIT)
-    if c == '"':
-        return (c, CharClass.QUOTE)
-    if c in ['+', '-', '*', '/', '>', '=', '<', '(', ')']:
+    if c in ['+', '-', '*', '/', '>', '=', '<', '<=', '>=']:
         return (c, CharClass.OPERATOR)
-    if c in ['.', ':', ',', ';']:
+    if c in ['.', ':', ';']:
         return (c, CharClass.PUNCTUATOR)
     if c in [' ', '\n', '\t']:
         return (c, CharClass.BLANK)
@@ -52,7 +48,7 @@ def addChar(input, lexeme):
         input = input[1:]
     return (input, lexeme)
 
-class tokens(Enum):
+class Token(Enum):
     ADDITION = 1
     ASSIGNMENT = 2
     BEGIN = 3
@@ -89,7 +85,11 @@ lookupToken = {
     "+"         : Token.ADDITION,
     "-"         : Token.SUBTRACTION,
     "*"         : Token.MULTIPLICATION,
-    "/"         : Token.DIVISION
+    "/"         : Token.DIVISION,
+    ">"         : Token.GREATER,
+    ">="        : Token.GREATER_EQUAL,
+    "<"         : Token.LESS,
+    "<="        : Token.LESS_EQUAL
 }
 
 class Tree:
@@ -138,26 +138,6 @@ def errorMessage(code):
     if code == 11:
         return msg + "identifier or literal value expected"
     return msg + "syntax error"
-
-def getChar(input):
-    if len(input) == 0:
-        return (None, CharClass.EOF)
-    c = input[0].lower()
-    if c.isalpha():
-        return (c, CharClass.LETTER)
-    if c.isdigit():
-        return (c, CharClass.DIGIT)
-    if c == '"':
-        return (c, CharClass.QUOTE)
-    if c in ['+', '-', '*', '/']:
-        return (c, CharClass.OPERATOR)
-    if c in ['.', ';']:
-        return (c, CharClass.PUNCTUATOR)
-    if c in [' ', '\n', '\t']:
-        return (c, CharClass.BLANK)
-    if c in ['(', ')']:
-        return (c, CharClass.DELIMITER)
-    return (c, CharClass.OTHER)
 
 def getNonBlank(input):
     ignore = ""
