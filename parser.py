@@ -201,6 +201,125 @@ def lex(input):
 
     raise Exception("Lexical Analyzer Error: unrecognized symbol was found!")
 
+def loadGrammar(input):
+    grammar = []
+    for line in input:
+        grammar.append(line.strip())
+    return grammar
+
+def getLHS(production):
+    return production.split("->")[0].strip()
+
+def getRHS(production):
+    return production.split("->")[1].strip().split(" ")
+
+def printGrammar(grammar):
+    i = 0
+    for production in grammar:
+        print(str(i) + ". " + getLHS(production), end = " -> ")
+        print(getRHS(production))
+        i += 1
+
+def loadTable(input):
+    actions = {}
+    gotos = {}
+    header = input.readline().strip().split(",")
+    end = header.index("$")
+    tokens = []
+    for field in header[1:end + 1]:
+        tokens.append(field)
+    variables = header[end + 1:]
+    for line in input:
+        row = line.strip().split(",")
+        state = int(row[0])
+        for i in range(len(tokens)):
+            token = tokens[i]
+            key = (state, token)
+            value = row[i + 1]
+            if len(value) == 0:
+                value = None
+            actions[key] = value
+        for i in range(len(variables)):
+            variable = variables[i]
+            key = (state, variable)
+            value = row[i + len(tokens) + 1]
+            if len(value) == 0:
+                value = None
+            gotos[key] = value
+    return (actions, gotos)
+
+def printActions(actions):
+    for key in actions:
+        print(key, end = " -> ")
+        print(actions[key])
+
+def printGotos(gotos):
+    for key in gotos:
+        print(key, end = " -> ")
+        print(gotos[key])
+
+def parse(input, grammar, actions, gotos):
+
+    trees = []
+
+    stack = []
+    stack.append(0)
+    while True:
+        print("stack: ", end = "")
+        print(stack, end = " ")
+        print("input: ", end = "")
+        print(input, end = " ")
+        state = stack[-1]
+        token = input[0]
+        action = actions[(state, token)]
+        print("action: ", end = "")
+        print(action)
+
+        if action is None:
+            return None
+
+        if action[0] == 's':
+            input.pop(0)
+            stack.append(token)
+            state = int(action[1])
+            stack.append(state)
+
+            tree = Tree()
+            tree.data = token
+            trees.append(tree)
+
+        elif action[0] == 'r':
+            production = grammar[int(action[1])]
+            lhs = getLHS(production)
+            rhs = getRHS(production)
+            for i in range(len(rhs) * 2):
+                stack.pop()
+            state = stack[-1]
+            stack.append(lhs)
+            stack.append(int(gotos[(state, lhs)]))
+
+            newTree = Tree()
+            newTree.data = lhs
+
+            for tree in trees[-len(rhs):]:
+                newTree.add(tree)
+
+            trees = trees[:-len(rhs)]
+
+            trees.append(newTree)
+
+        else:
+            production = grammar[0]
+            lhs = getLHS(production)
+            rhs = getRHS(production)
+
+            root = Tree()
+            root.data = lhs
+            for tree in trees:
+                root.add(tree)
+
+            return root
+
 
 if __name__ == "__main__":
 
