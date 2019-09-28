@@ -1,6 +1,14 @@
+#===========================================================
+# Authors:
+# Robert Kupfner
+# Gil Leibovich
+#===========================================================
+
+import sys
+
 from enum import Enum
 
-
+source = sys.argv[1]
 
 class tokens(Enum):
     ADDITION = 1
