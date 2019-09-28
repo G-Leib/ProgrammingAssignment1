@@ -85,7 +85,7 @@ class tokens(Enum):
     OTHER = 30
 
 lookupToken = {
-    "$"         : Token.EOF,
+    "."         : Token.END,
     "+"         : Token.ADDITION,
     "-"         : Token.SUBTRACTION,
     "*"         : Token.MULTIPLICATION,
@@ -339,6 +339,7 @@ if __name__ == "__main__":
     input = source.read()
     source.close()
     output = []
+    inputToken = []
 
     while True:
         input, lexeme, token = lex(input)
@@ -347,4 +348,30 @@ if __name__ == "__main__":
         output.append((lexeme, token))
 
     for (lexeme, token) in output:
-        print(lexeme, token)
+        print(token)
+        for item in token:
+            inputToken.append(item.lower())
+
+    input = open("Tables/formatted_grammar.txt", "rt")
+    grammar = loadGrammar(input)
+    # printGrammar(grammar)
+    input.close()
+
+    input = open("Tables/lsr_table.csv", "rt")
+    actions, gotos = loadTable(input)
+    # printActions(actions)
+    # printGotos(gotos)
+    input.close()
+
+    # in the beginning we will write the input as a sequence of terminal symbols, ending by $
+    # later we will integrate this code with the lexical analyzer
+    input = [ 'l', '+', 'i', '/', 'l', '*', 'l', '$' ]
+
+    # tree building update
+    tree = parse(inputToken, grammar, actions, gotos)
+    if tree:
+        print("Input is syntactically correct!")
+        print("Parse Tree:")
+        tree.print()
+    else:
+        print("Code has syntax errors!")
