@@ -1,0 +1,16 @@
+Source File,Expected Result
+source1.pas,Success!
+source2.pas,Success!
+source3.pas,Success!
+source4.pas,Error 07: identifier expected
+source5.pas,Error 08: special word missing
+source6.pas,Error 99: syntax error
+source7.pas,Error 09: symbol missing
+source8.pas,Error 10: data type expected
+source9.pas,Error 99: syntax error
+source10.pas,Error 09: symbol missing
+source11.pas,Error 09: symbol missing
+source12.pas,Error 11: identifier or literal value expected
+source13.pas,Error 99: syntax error
+source14.pas,Error 99: syntax error
+source15.pas,Error 06: EOF expected

@@ -1,0 +1,13 @@
+Error#,Description
+1,Source file missing
+2,Couldn’t open source file
+3,Lexical error
+4,Couldn’t open grammar file
+5,Couldn’t open SLR table file
+6,EOF expected
+7,Identifier expected
+8,Special word missing
+9,Symbol missing
+10,Data type expected
+11,Identifier or literal value expected
+99,Syntax error
