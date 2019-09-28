@@ -1,0 +1,23 @@
+<program> -> program <identifier> <block> .
+<identifier> -> <letter> { <letter> | <digit> }
+<block> -> [ <var_declaration_section> ] <compound_statement>
+<var_declaration_section> -> var <var_declaration> {; <var_de | <write_statement>
+<assignment_statement> -> <identifier> := <expression>
+<read_statement> -> read <identifier>
+<write_statement> -> write ( <identifier> | <literal> )
+<structured_statement> -> <if_statement> | <while_statement> | <compound_statement>
+<if_statement> -> if <boolean_expression> then <statement> [ else <statement> ]
+<while_statemnet> -> while <boolean_expression> do <statement>
+<expression> -> <arithmetic_expression> | <boolean_expression>
+<arithmetic_expression> -> <arithmetic_expression> ( + | - ) <term> | <term>
+<term> -> <term> * <factor> | <factor>
+<factor> -> <identifier> | <integer_literal> 
+<literal> -> <integer_literal> | <boolean_literal> 
+<integer_literal> -> <digit> { <digit> }
+<boolean_literal> -> true | falseclaration> }
+<var_declaration> -> <identifier> { <identifier> } : <type>
+<type> -> Integer | Boolean
+<compound_statement> -> begin <statement> { ; <statement> } end
+<statement> -> <simple_statement> | <structured_statement>
+<simple_statement> -> <assignment_statement> | <read_statement>
+<boolean_expression> -> <boolean_literal> | <arithmetic_expression> ( > | >= | = | <= | < ) <arithmetic_expression>
