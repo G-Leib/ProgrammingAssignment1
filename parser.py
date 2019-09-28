@@ -1,13 +1,6 @@
 from enum import Enum
 
 
-def table_to_dict(fname):
-    with open(fname, 'r') as f:
-        fstring = f.read()
-        d = dict([[line.split(',')[0], line.split(',')[1]] for line in fstring.splitlines()[1:]])
-    return d
-
-errors = table_to_dict('Tables/error_table.csv')
 
 class tokens(Enum):
     ADDITION = 1
@@ -41,3 +34,28 @@ class tokens(Enum):
     WRITE = 29
     OTHER = 30
 
+def errorMessage(code):
+    msg = "Error " + str(code).zfill(2) + ": "
+    if code == 1:
+        return msg + "source file missing"
+    if code == 2:
+        return msg + "couldn't open source file"
+    if code == 3:
+        return msg + "lexical error"
+    if code == 4:
+        return msg + "couldn't open grammar file"
+    if code == 5:
+        return msg + "couldn't open SLR table file"
+    if code == 6:
+        return msg + "EOF expected"
+    if code == 7:
+        return msg + "identifier expected"
+    if code == 8:
+        return msg + "special word missing"
+    if code == 9:
+        return msg + "symbol missing"
+    if code == 10:
+        return msg + "data type expected"
+    if code == 11:
+        return msg + "identifier or literal value expected"
+    return msg + "syntax error"
