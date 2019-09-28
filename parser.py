@@ -1,5 +1,14 @@
-from enum import Enum
+#===========================================================
+# Authors:
+# Robert Kupfner
+# Gil Leibovich
+#===========================================================
+
 import sys
+
+from enum import Enum
+
+source = sys.argv[1]
 
 class CharClass(Enum):
     EOF        = 1
