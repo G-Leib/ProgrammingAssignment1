@@ -200,3 +200,25 @@ def lex(input):
             return (input, lexeme, lookup[lexeme])
 
     raise Exception("Lexical Analyzer Error: unrecognized symbol was found!")
+
+
+if __name__ == "__main__":
+
+    
+    if len(sys.argv) != 2:
+        raise ValueError("Missing source file")
+    source = open(sys.argv[1], "rt")
+    if not source:
+        raise IOError("Couldn't open source file")
+    input = source.read()
+    source.close()
+    output = []
+
+    while True:
+        input, lexeme, token = lex(input)
+        if lexeme == None:
+            break
+        output.append((lexeme, token))
+
+    for (lexeme, token) in output:
+        print(lexeme, token)
