@@ -32,7 +32,7 @@ i' -> i
 type -> Integer 
 type -> Boolean
 comp_stat -> begin statement' end
-statement' -> statement ; statment'
+statement' -> statement ; statement'
 statement' -> statement
 statement -> simple_stat 
 statement -> struct_stat
