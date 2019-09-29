@@ -24,7 +24,7 @@ def getChar(input):
         return (c, CharClass.LETTER)
     if c.isdigit():
         return (c, CharClass.DIGIT)
-    if c in ['+', '-', '*', '/', '>', '=', '<', '<=', '>=']:
+    if c in ['+', '-', '*', '/', '>', '=', '<', '<=', '>=', ':=']:
         return (c, CharClass.OPERATOR)
     if c in ['.', ':', ';']:
         return (c, CharClass.PUNCTUATOR)
@@ -90,7 +90,28 @@ lookupToken = {
     ">"         : Token.GREATER,
     ">="        : Token.GREATER_EQUAL,
     "<"         : Token.LESS,
-    "<="        : Token.LESS_EQUAL
+    "<="        : Token.LESS_EQUAL,
+    "begin"     : Token.BEGIN,
+    "do"        : Token.DO,
+    "else"      : Token.ELSE,
+    "end"       : Token.END,
+    "false"     : Token.FALSE,
+    "if"        : Token.IF,
+    "."         : Token.PERIOD,
+    ":="        : Token.ASSIGNMENT,
+    "="         : Token.EQUAL,
+    "boolean"   : Token.BOOLEAN_TYPE,
+    "integer"   : Token.INTEGER_TYPE,
+    "program"   : Token.PROGRAM,
+    "read"      : Token.READ,
+    ";"         : Token.SEMICOLON,
+    ":"         : Token.COLON,
+    "then"      : Token.THEN,
+    "true"      : Token.TRUE,
+    "var"       : Token.VAR,
+    "while"     : Token.WHILE,
+    "write"     : Token.WRITE,
+
 }
 
 class Tree:
@@ -162,6 +183,7 @@ def lex(input):
     lexeme = ""
 
     if charClass == CharClass.EOF:
+
         return (input, None, None)
 
     if charClass == CharClass.LETTER:
@@ -172,7 +194,11 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT and charClass != CharClass.LETTER:
                 break
-        return (input, lexeme, Token.IDENTIFIER)
+
+        if lexeme.lower() in lookupToken.keys():
+            return (input, lexeme, lookupToken[lexeme.lower()])
+        else:
+            return (input, lexeme, Token.IDENTIFIER)
 
     if charClass == CharClass.DIGIT:
         while True:
@@ -184,10 +210,14 @@ def lex(input):
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
-        if lexeme in lookup:
-            return (input, lexeme, lookup[lexeme])
+        if lexeme in lookupToken.keys():
+            return (input, lexeme, lookupToken[lexeme])
 
-    raise Exception("Lexical Analyzer Error: unrecognized symbol was found!")
+    if charClass == CharClass.PUNCTUATOR:
+        input, lexeme = addChar(input, lexeme)
+        return (input, lexeme, lookupToken[lexeme])
+
+    raise Exception("Lexical Analyzer Error: unrecognized symbol ( {} ) was found!".format(lexeme))
 
 def loadGrammar(input):
     grammar = []
@@ -315,39 +345,44 @@ def parse(input, grammar, actions, gotos):
 if __name__ == "__main__":
 
     
-    # if len(sys.argv) != 2:
-    #     raise ValueError("Missing source file")
-    # source = open(sys.argv[1], "rt")
-    # if not source:
-    #     raise IOError("Couldn't open source file")
-    # input = source.read()
-    # source.close()
-    # output = []
+    if len(sys.argv) != 2:
+        raise ValueError("Missing source file")
+    source = open(sys.argv[1], "rt")
+    if not source:
+        raise IOError("Couldn't open source file")
+    
+    input = source.read()
+    source.close()
+    tokens = []
+    tape = []
 
-    input = open("grammar.txt", "rt")
-    grammar = loadGrammar(input)
-    #printGrammar(grammar)
-    input.close()
+    while True:
+        input, lexeme, token = lex(input)
+        if lexeme == None:
+            break
+        tape.append(lexeme)
+        tokens.append(token)
+    print(tape)
+    print('\n')
+    print(tokens)
 
-    input = open("slr_table.txt", "rt")
-    actions, gotos = loadTable(input)
-    #printActions(actions)
-    #printGotos(gotos)
-    input.close()
+    # input = open("grammar.txt", "rt")
+    # grammar = loadGrammar(input)
+    # #printGrammar(grammar)
+    # input.close()
 
-    input = [ 'program', 'i', 'begin', 'write', 'i', 'end', '.', '$' ]
+    # input = open("slr_table.txt", "rt")
+    # actions, gotos = loadTable(input)
+    # #printActions(actions)
+    # #printGotos(gotos)
+    # input.close()
 
-    if parse(input, grammar, actions, gotos):
-        print("Input is syntactically correct!")
-    else:
-        print("There is a syntax error!")
+    # input = [ 'program', 'i', 'begin', 'write', 'i', 'end', '.', '$' ]
 
-    # while True:
-    #     input, lexeme, token = lex(input)
-    #     if lexeme == None:
-    #         break
-    #     output.append((lexeme, token))
+    # if parse(input, grammar, actions, gotos):
+    #     print("Input is syntactically correct!")
+    # else:
+    #     print("There is a syntax error!")
 
-
-    # for (lexeme, token) in output:
-    #     print(lexeme, token)
+    # # for (lexeme, token) in output:
+    # #     print(lexeme, token)
