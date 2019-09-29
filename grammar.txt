@@ -45,5 +45,5 @@ bool_expr -> arithmetic_expr >= arithmetic_expr
 bool_expr -> arithmetic_expr = arithmetic_expr
 bool_expr -> arithmetic_expr <= arithmetic_expr
 bool_expr -> arithmetic_expr < arithmetic_expr
-bool_l -> true 
+bool_l -> true
 bool_l -> false

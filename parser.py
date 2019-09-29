@@ -7,8 +7,6 @@
 import sys
 from enum import Enum
 
-grammarInput = []
-
 class CharClass(Enum):
     EOF        = 1
     LETTER     = 2
@@ -206,8 +204,7 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT:
                 break
-        grammarInput.append("l")
-        return (input, lexeme, tokens.LITERAL)
+        return (input, lexeme, Token.INTEGER_LITERAL)
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
@@ -225,7 +222,7 @@ def lex(input):
             return (input, lexeme, lookupToken[lexeme])
         return (input, lexeme, lookupToken[lexeme])
 
-    raise Exception("Lexical Analyzer Error: unrecognized symbol ( {} ) was found!".format(lexeme))
+    raise Exception("{} on symbol {}".format(errorMessage(3), lexeme))
 
 def loadGrammar(input):
     grammar = []
@@ -249,7 +246,7 @@ def printGrammar(grammar):
 def loadTable(input):
     actions = {}
     gotos = {}
-    header = input.readline().strip().split(",")
+    header = [h.lower() for h in input.readline().strip().split(",")]
     end = header.index("$")
     tokens = []
     for field in header[1:end + 1]:
@@ -272,6 +269,7 @@ def loadTable(input):
             if len(value) == 0:
                 value = None
             gotos[key] = value
+
     return (actions, gotos)
 
 def printActions(actions):
@@ -307,7 +305,7 @@ def parse(input, grammar, actions, gotos):
         if action[0] == 's':
             input.pop(0)
             stack.append(token)
-            state = int(action[1])
+            state = int(action[1:])
             stack.append(state)
 
             tree = Tree()
@@ -315,7 +313,7 @@ def parse(input, grammar, actions, gotos):
             trees.append(tree)
 
         elif action[0] == 'r':
-            production = grammar[int(action[1])]
+            production = grammar[int(action[1:])]
             lhs = getLHS(production)
             rhs = getRHS(production)
             for i in range(len(rhs) * 2):
@@ -335,6 +333,7 @@ def parse(input, grammar, actions, gotos):
             trees.append(newTree)
 
         elif action == 'acc':
+            print ('\naction:\t', action, '\n')
             return True
 
         else:
@@ -346,6 +345,8 @@ def parse(input, grammar, actions, gotos):
             root.data = lhs
             for tree in trees:
                 root.add(tree)
+            
+            print ('\naction:\t', action, '\n')
 
             return root
 
@@ -354,10 +355,10 @@ if __name__ == "__main__":
 
     
     if len(sys.argv) != 2:
-        raise ValueError("Missing source file")
+        raise Exception(errorMessage(1))
     source = open(sys.argv[1], "rt")
     if not source:
-        raise IOError("Couldn't open source file")
+        raise IOError(errorMessage(2))
     
     input = source.read()
     source.close()
@@ -369,36 +370,47 @@ if __name__ == "__main__":
     while True:
         input, lexeme, token = lex(input)
         if lexeme == None:
+            tape.append("$")
             break
 
         
         if token == Token.IDENTIFIER:
-            tape.append('i')
+            lexeme = 'i'
         elif token == Token.INTEGER_LITERAL:
-            tape.append('l')
-        else:
-            tape.append(lexeme)
+            lexeme = 'int_l'
+        
+        tape.append(lexeme)
         
         tokens.append(token)
-        output.append([lexeme, token, tape[-1]])
+        output.append([lexeme, token])
 
-    for (lexeme, token, tape_token) in output:
-        print(token, '\t', lexeme, '\t', tape_token)
+    for (lexeme, token) in output:
+        print(lexeme, '\t', token)
 
-    input = open("grammar.txt", "rt")
+    try:
+        input = open("grammar.txt", "rt")
+    except Exception:
+        raise IOError(errorMessage(4))
     grammar = loadGrammar(input)
-    #printGrammar(grammar)
+    # printGrammar(grammar)
     input.close()
 
-    input = open("slr_table.txt", "rt")
+    try:
+        input = open("slr_table.txt", "rt")
+    except Exception:
+        raise IOError(errorMessage(5))
     actions, gotos = loadTable(input)
-    #printActions(actions)
-    #printGotos(gotos)
+    # printActions(actions)
+    # printGotos(gotos)
     input.close()
 
     input = tape
 
-    if parse(input, grammar, actions, gotos):
+    prs = parse(input, grammar, actions, gotos)
+
+    print('\n',type(prs),'\n')
+
+    if prs:
         print("Input is syntactically correct!")
     else:
-        print("There is a syntax error!")
+        raise Exception(errorMessage(99))
