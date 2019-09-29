@@ -8,6 +8,8 @@ import sys
 
 from enum import Enum
 
+grammarInput = []
+
 class CharClass(Enum):
     EOF        = 1
     LETTER     = 2
@@ -84,12 +86,11 @@ class tokens(Enum):
     WRITE = 29
     OTHER = 30
 
-lookupToken = {
-    "."         : Token.END,
-    "+"         : Token.ADDITION,
-    "-"         : Token.SUBTRACTION,
-    "*"         : Token.MULTIPLICATION,
-    "/"         : Token.DIVISION
+lookup = {
+    "."         : tokens.PERIOD,
+    "+"         : tokens.ADDITION,
+    "-"         : tokens.SUBTRACTION,
+    "*"         : tokens.MULTIPLICATION
 }
 
 class Tree:
@@ -191,7 +192,8 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT and charClass != CharClass.LETTER:
                 break
-        return (input, lexeme, Token.IDENTIFIER)
+        grammarInput.append("i")
+        return (input, lexeme, tokens.IDENTIFIER)
 
     if charClass == CharClass.DIGIT:
         while True:
@@ -199,7 +201,8 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT:
                 break
-        return (input, lexeme, Token.LITERAL)
+        grammarInput.append("l")
+        return (input, lexeme, tokens.LITERAL)
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
