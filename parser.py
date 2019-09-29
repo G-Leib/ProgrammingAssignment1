@@ -5,7 +5,6 @@
 #===========================================================
 
 import sys
-
 from enum import Enum
 
 grammarInput = []
@@ -16,9 +15,8 @@ class CharClass(Enum):
     DIGIT      = 3
     OPERATOR   = 4
     PUNCTUATOR = 5
-    QUOTE      = 6
-    BLANK      = 7
-    OTHER      = 8
+    BLANK      = 6
+    OTHER      = 7
 
 def getChar(input):
     if len(input) == 0:
@@ -28,11 +26,9 @@ def getChar(input):
         return (c, CharClass.LETTER)
     if c.isdigit():
         return (c, CharClass.DIGIT)
-    if c == '"':
-        return (c, CharClass.QUOTE)
-    if c in ['+', '-', '*', '/', '>', '=', '<', '(', ')']:
+    if c in ['+', '-', '*', '/', '>', '=', '<', '<=', '>=', ':=']:
         return (c, CharClass.OPERATOR)
-    if c in ['.', ':', ',', ';']:
+    if c in ['.', ':', ';']:
         return (c, CharClass.PUNCTUATOR)
     if c in [' ', '\n', '\t']:
         return (c, CharClass.BLANK)
@@ -54,7 +50,7 @@ def addChar(input, lexeme):
         input = input[1:]
     return (input, lexeme)
 
-class tokens(Enum):
+class Token(Enum):
     ADDITION = 1
     ASSIGNMENT = 2
     BEGIN = 3
@@ -84,31 +80,39 @@ class tokens(Enum):
     VAR = 27
     WHILE = 28
     WRITE = 29
-    OTHER = 30
+    DIVISION = 30
+    EOF = 31
 
-lookup = {
-    "."         : tokens.PERIOD,
-    "+"         : tokens.ADDITION,
-    "-"         : tokens.SUBTRACTION,
-    "*"         : tokens.MULTIPLICATION,
-    "*"         : tokens.EQUAL,
-    "<"         : tokens.LESS,
-    ">"         : tokens.GREATER,
-    "<="         : tokens.LESS_EQUAL,
-    ">="         : tokens.GREATER_EQUAL,
-    ":"         : tokens.COLON,
-    ";"         : tokens.SEMICOLON,
-    "else"         : tokens.ELSE,
-    "false"         : tokens.FALSE,
-    "true"         : tokens.TRUE,
-    "if"         : tokens.IF,
-    "program"         : tokens.PROGRAM,
-    "begin"         : tokens.BEGIN,
-    "read"         : tokens.READ,
-    "then"         : tokens.THEN,
-    "var"         : tokens.VAR,
-    "while"         : tokens.WHILE,
-    "write"         : tokens.WRITE
+lookupToken = {
+    "$"         : Token.EOF,
+    "+"         : Token.ADDITION,
+    "-"         : Token.SUBTRACTION,
+    "*"         : Token.MULTIPLICATION,
+    "/"         : Token.DIVISION,
+    ">"         : Token.GREATER,
+    ">="        : Token.GREATER_EQUAL,
+    "<"         : Token.LESS,
+    "<="        : Token.LESS_EQUAL,
+    "begin"     : Token.BEGIN,
+    "do"        : Token.DO,
+    "else"      : Token.ELSE,
+    "end"       : Token.END,
+    "false"     : Token.FALSE,
+    "if"        : Token.IF,
+    "."         : Token.PERIOD,
+    ":="        : Token.ASSIGNMENT,
+    "="         : Token.EQUAL,
+    "boolean"   : Token.BOOLEAN_TYPE,
+    "integer"   : Token.INTEGER_TYPE,
+    "program"   : Token.PROGRAM,
+    "read"      : Token.READ,
+    ";"         : Token.SEMICOLON,
+    ":"         : Token.COLON,
+    "then"      : Token.THEN,
+    "true"      : Token.TRUE,
+    "var"       : Token.VAR,
+    "while"     : Token.WHILE,
+    "write"     : Token.WRITE
 }
 
 class Tree:
@@ -158,26 +162,6 @@ def errorMessage(code):
         return msg + "identifier or literal value expected"
     return msg + "syntax error"
 
-def getChar(input):
-    if len(input) == 0:
-        return (None, CharClass.EOF)
-    c = input[0].lower()
-    if c.isalpha():
-        return (c, CharClass.LETTER)
-    if c.isdigit():
-        return (c, CharClass.DIGIT)
-    if c == '"':
-        return (c, CharClass.QUOTE)
-    if c in ['+', '-', '*', '/']:
-        return (c, CharClass.OPERATOR)
-    if c in ['.', ';']:
-        return (c, CharClass.PUNCTUATOR)
-    if c in [' ', '\n', '\t']:
-        return (c, CharClass.BLANK)
-    if c in ['(', ')']:
-        return (c, CharClass.DELIMITER)
-    return (c, CharClass.OTHER)
-
 def getNonBlank(input):
     ignore = ""
     while True:
@@ -200,19 +184,21 @@ def lex(input):
     lexeme = ""
 
     if charClass == CharClass.EOF:
+
         return (input, None, None)
 
     if charClass == CharClass.LETTER:
-        input, lexeme = addChar(input, lexeme)
-
         while True:
             input, lexeme = addChar(input, lexeme)
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT and charClass != CharClass.LETTER:
                 break
-        if lexeme in lookup:
-        grammarInput.append("i")
-        return (input, lexeme, tokens.IDENTIFIER)
+
+
+        if lexeme.lower() in lookupToken.keys():
+            return (input, lexeme, lookupToken[lexeme.lower()])
+        else:
+            return (input, lexeme, Token.IDENTIFIER)
 
     if charClass == CharClass.DIGIT:
         while True:
@@ -225,10 +211,21 @@ def lex(input):
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
-        if lexeme in lookup:
-            return (input, lexeme, lookup[lexeme])
+        c, charClass = getChar(input)
+        if c == '=':
+            input, lexeme = addChar(input, lexeme)
+        if lexeme in lookupToken.keys():
+            return (input, lexeme, lookupToken[lexeme])
 
-    raise Exception("Lexical Analyzer Error: unrecognized symbol was found!")
+    if charClass == CharClass.PUNCTUATOR:
+        input, lexeme = addChar(input, lexeme)
+        c, charClass = getChar(input)
+        if lexeme == ':' and c == '=':
+            input, lexeme = addChar(input, lexeme)
+            return (input, lexeme, lookupToken[lexeme])
+        return (input, lexeme, lookupToken[lexeme])
+
+    raise Exception("Lexical Analyzer Error: unrecognized symbol ( {} ) was found!".format(lexeme))
 
 def loadGrammar(input):
     grammar = []
@@ -337,6 +334,9 @@ def parse(input, grammar, actions, gotos):
 
             trees.append(newTree)
 
+        elif action == 'acc':
+            return True
+
         else:
             production = grammar[0]
             lhs = getLHS(production)
@@ -358,8 +358,11 @@ if __name__ == "__main__":
     source = open(sys.argv[1], "rt")
     if not source:
         raise IOError("Couldn't open source file")
+    
     input = source.read()
     source.close()
+    tokens = []
+    tape = []
     output = []
     inputToken = []
 
@@ -367,33 +370,35 @@ if __name__ == "__main__":
         input, lexeme, token = lex(input)
         if lexeme == None:
             break
-        output.append((lexeme, token))
 
-    for (lexeme, token) in output:
-        print(token)
-        for item in token:
-            inputToken.append(item.lower())
+        
+        if token == Token.IDENTIFIER:
+            tape.append('i')
+        elif token == Token.INTEGER_LITERAL:
+            tape.append('l')
+        else:
+            tape.append(lexeme)
+        
+        tokens.append(token)
+        output.append([lexeme, token, tape[-1]])
 
-    input = open("Tables/formatted_grammar.txt", "rt")
+    for (lexeme, token, tape_token) in output:
+        print(token, '\t', lexeme, '\t', tape_token)
+
+    input = open("grammar.txt", "rt")
     grammar = loadGrammar(input)
-    # printGrammar(grammar)
+    #printGrammar(grammar)
     input.close()
 
-    input = open("Tables/lsr_table.csv", "rt")
+    input = open("slr_table.txt", "rt")
     actions, gotos = loadTable(input)
-    # printActions(actions)
-    # printGotos(gotos)
+    #printActions(actions)
+    #printGotos(gotos)
     input.close()
 
-    # in the beginning we will write the input as a sequence of terminal symbols, ending by $
-    # later we will integrate this code with the lexical analyzer
-    input = [ 'l', '+', 'i', '/', 'l', '*', 'l', '$' ]
+    input = tape
 
-    # tree building update
-    tree = parse(inputToken, grammar, actions, gotos)
-    if tree:
+    if parse(input, grammar, actions, gotos):
         print("Input is syntactically correct!")
-        print("Parse Tree:")
-        tree.print()
     else:
-        print("Code has syntax errors!")
+        print("There is a syntax error!")
