@@ -282,6 +282,14 @@ def printGotos(gotos):
         print(key, end = " -> ")
         print(gotos[key])
 
+
+# TODO: fill complete conditions for remaining syntax errors: 7, 8, 9, 10, 11
+def handle_syntax_error(stack, input):
+    if stack[-2] == '.' and input[0] != '$':
+        raise Exception(errorMessage(6))
+    else:
+        raise Exception(errorMessage(99))
+
 def parse(input, grammar, actions, gotos):
 
     trees = []
@@ -300,7 +308,8 @@ def parse(input, grammar, actions, gotos):
         print(action)
 
         if action is None:
-            return None
+            handle_syntax_error(stack, input)
+
 
         if action[0] == 's':
             input.pop(0)
@@ -333,8 +342,7 @@ def parse(input, grammar, actions, gotos):
             trees.append(newTree)
 
         elif action == 'acc':
-            print ('\naction:\t', action, '\n')
-            return True
+            return tree
 
         else:
             production = grammar[0]
@@ -346,8 +354,6 @@ def parse(input, grammar, actions, gotos):
             for tree in trees:
                 root.add(tree)
             
-            print ('\naction:\t', action, '\n')
-
             return root
 
 
@@ -384,8 +390,8 @@ if __name__ == "__main__":
         tokens.append(token)
         output.append([lexeme, token])
 
-    for (lexeme, token) in output:
-        print(lexeme, '\t', token)
+    # for (lexeme, token) in output:
+    #     print(lexeme, '\t', token)
 
     try:
         input = open("grammar.txt", "rt")
@@ -406,11 +412,8 @@ if __name__ == "__main__":
 
     input = tape
 
-    prs = parse(input, grammar, actions, gotos)
+    parse_tree = parse(input, grammar, actions, gotos)
 
-    print('\n',type(prs),'\n')
+    print('\n',type(parse_tree),'\n')
 
-    if prs:
-        print("Input is syntactically correct!")
-    else:
-        raise Exception(errorMessage(99))
+    parse_tree.print()
