@@ -2,7 +2,7 @@ prog -> program i block .
 block -> var_dec_sec comp_stat
 block -> comp_stat
 var_dec_sec -> var var_dec'
-var_dec' -> var_dec ; var_dec'
+var_dec' -> var_dec var_dec'
 var_dec' -> var_dec
 assignment -> i := expr
 read_stat -> read i

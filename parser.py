@@ -246,7 +246,7 @@ def printGrammar(grammar):
 def loadTable(input):
     actions = {}
     gotos = {}
-    header = input.readline().strip().split(",")
+    header = [h.lower() for h in input.readline().strip().split(",")]
     end = header.index("$")
     tokens = []
     for field in header[1:end + 1]:
@@ -269,6 +269,7 @@ def loadTable(input):
             if len(value) == 0:
                 value = None
             gotos[key] = value
+
     return (actions, gotos)
 
 def printActions(actions):
@@ -304,7 +305,7 @@ def parse(input, grammar, actions, gotos):
         if action[0] == 's':
             input.pop(0)
             stack.append(token)
-            state = int(action[1])
+            state = int(action[1:])
             stack.append(state)
 
             tree = Tree()
@@ -312,7 +313,7 @@ def parse(input, grammar, actions, gotos):
             trees.append(tree)
 
         elif action[0] == 'r':
-            production = grammar[int(action[1])]
+            production = grammar[int(action[1:])]
             lhs = getLHS(production)
             rhs = getRHS(production)
             for i in range(len(rhs) * 2):
@@ -376,7 +377,7 @@ if __name__ == "__main__":
         if token == Token.IDENTIFIER:
             lexeme = 'i'
         elif token == Token.INTEGER_LITERAL:
-            lexeme = 'l'
+            lexeme = 'int_l'
         
         tape.append(lexeme)
         
