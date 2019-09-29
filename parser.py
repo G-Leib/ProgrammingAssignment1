@@ -210,11 +210,18 @@ def lex(input):
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
+        c, charClass = getChar(input)
+        if c == '=':
+            input, lexeme = addChar(input, lexeme)
         if lexeme in lookupToken.keys():
             return (input, lexeme, lookupToken[lexeme])
 
     if charClass == CharClass.PUNCTUATOR:
         input, lexeme = addChar(input, lexeme)
+        c, charClass = getChar(input)
+        if lexeme == ':' and c == '=':
+            input, lexeme = addChar(input, lexeme)
+            return (input, lexeme, lookupToken[lexeme])
         return (input, lexeme, lookupToken[lexeme])
 
     raise Exception("Lexical Analyzer Error: unrecognized symbol ( {} ) was found!".format(lexeme))
@@ -355,6 +362,7 @@ if __name__ == "__main__":
     source.close()
     tokens = []
     tape = []
+    debug = []
 
     while True:
         input, lexeme, token = lex(input)
@@ -362,9 +370,9 @@ if __name__ == "__main__":
             break
         tape.append(lexeme)
         tokens.append(token)
-    print(tape)
-    print('\n')
-    print(tokens)
+        debug.append(str(lexeme) + ' = ' + str(token))
+
+    print(debug)
 
     # input = open("grammar.txt", "rt")
     # grammar = loadGrammar(input)
