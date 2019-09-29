@@ -187,8 +187,6 @@ def lex(input):
         return (input, None, None)
 
     if charClass == CharClass.LETTER:
-        input, lexeme = addChar(input, lexeme)
-
         while True:
             input, lexeme = addChar(input, lexeme)
             c, charClass = getChar(input)
