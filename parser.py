@@ -377,6 +377,9 @@ if __name__ == "__main__":
         tokens.append(token)
         output = (lexeme, token)
 
+    for (lexeme, token) in output:
+        print(lexeme, token)
+
     input = open("grammar.txt", "rt")
     grammar = loadGrammar(input)
     #printGrammar(grammar)
@@ -394,6 +397,3 @@ if __name__ == "__main__":
         print("Input is syntactically correct!")
     else:
         print("There is a syntax error!")
-
-    for (lexeme, token) in output:
-        print(lexeme, token)
