@@ -381,17 +381,17 @@ if __name__ == "__main__":
 
         
         if token == Token.IDENTIFIER:
-            lexeme = 'i'
+            tape.append('i')
         elif token == Token.INTEGER_LITERAL:
-            lexeme = 'int_l'
-        
-        tape.append(lexeme)
+            tape.append('int_l')
+        else:
+            tape.append(lexeme)
         
         tokens.append(token)
-        output.append([lexeme, token])
+        output.append([lexeme, token, tape[-1]])
 
-    # for (lexeme, token) in output:
-    #     print(lexeme, '\t', token)
+    for (lexeme, token, t)in output:
+        print(lexeme, '\t', t, '\t', token)
 
     try:
         input = open("grammar.txt", "rt")
