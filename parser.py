@@ -360,7 +360,7 @@ if __name__ == "__main__":
     source.close()
     tokens = []
     tape = []
-    debug = []
+    output = []
 
     while True:
         input, lexeme, token = lex(input)
@@ -375,10 +375,10 @@ if __name__ == "__main__":
             tape.append(lexeme)
         
         tokens.append(token)
-        output = (lexeme, token)
+        output.append([lexeme, token, tape[-1]])
 
-    for (lexeme, token) in output:
-        print(lexeme, token)
+    for (lexeme, token, tape_token) in output:
+        print(token, '\t', lexeme, '\t', tape_token)
 
     input = open("grammar.txt", "rt")
     grammar = loadGrammar(input)
