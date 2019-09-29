@@ -366,29 +366,34 @@ if __name__ == "__main__":
         input, lexeme, token = lex(input)
         if lexeme == None:
             break
-        tape.append(lexeme)
+        
+        if token == Token.IDENTIFIER:
+            tape.append('i')
+        elif token == Token.INTEGER_LITERAL:
+            tape.append('l')
+        else:
+            tape.append(lexeme)
+        
         tokens.append(token)
-        debug.append(str(lexeme) + ' = ' + str(token))
+        output = (lexeme, token)
 
-    print(debug)
+    input = open("grammar.txt", "rt")
+    grammar = loadGrammar(input)
+    #printGrammar(grammar)
+    input.close()
 
-    # input = open("grammar.txt", "rt")
-    # grammar = loadGrammar(input)
-    # #printGrammar(grammar)
-    # input.close()
+    input = open("slr_table.txt", "rt")
+    actions, gotos = loadTable(input)
+    #printActions(actions)
+    #printGotos(gotos)
+    input.close()
 
-    # input = open("slr_table.txt", "rt")
-    # actions, gotos = loadTable(input)
-    # #printActions(actions)
-    # #printGotos(gotos)
-    # input.close()
+    input = tape
 
-    # input = [ 'program', 'i', 'begin', 'write', 'i', 'end', '.', '$' ]
+    if parse(input, grammar, actions, gotos):
+        print("Input is syntactically correct!")
+    else:
+        print("There is a syntax error!")
 
-    # if parse(input, grammar, actions, gotos):
-    #     print("Input is syntactically correct!")
-    # else:
-    #     print("There is a syntax error!")
-
-    # # for (lexeme, token) in output:
-    # #     print(lexeme, token)
+    for (lexeme, token) in output:
+        print(lexeme, token)
