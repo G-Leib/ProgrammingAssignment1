@@ -90,7 +90,25 @@ lookup = {
     "."         : tokens.PERIOD,
     "+"         : tokens.ADDITION,
     "-"         : tokens.SUBTRACTION,
-    "*"         : tokens.MULTIPLICATION
+    "*"         : tokens.MULTIPLICATION,
+    "*"         : tokens.EQUAL,
+    "<"         : tokens.LESS,
+    ">"         : tokens.GREATER,
+    "<="         : tokens.LESS_EQUAL,
+    ">="         : tokens.GREATER_EQUAL,
+    ":"         : tokens.COLON,
+    ";"         : tokens.SEMICOLON,
+    "else"         : tokens.ELSE,
+    "false"         : tokens.FALSE,
+    "true"         : tokens.TRUE,
+    "if"         : tokens.IF,
+    "program"         : tokens.PROGRAM,
+    "begin"         : tokens.BEGIN,
+    "read"         : tokens.READ,
+    "then"         : tokens.THEN,
+    "var"         : tokens.VAR,
+    "while"         : tokens.WHILE,
+    "write"         : tokens.WRITE
 }
 
 class Tree:
@@ -192,6 +210,7 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT and charClass != CharClass.LETTER:
                 break
+        if lexeme in lookup:
         grammarInput.append("i")
         return (input, lexeme, tokens.IDENTIFIER)
 
