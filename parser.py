@@ -341,8 +341,9 @@ def parse(input, grammar, actions, gotos):
 
             trees.append(newTree)
 
-        elif action == 'acc':
-            return tree
+#        elif action == 'acc':
+#            print(tree.data + " action elif")
+#            return tree
 
         else:
             production = grammar[0]
@@ -352,8 +353,9 @@ def parse(input, grammar, actions, gotos):
             root = Tree()
             root.data = lhs
             for tree in trees:
+                print(tree.data)
                 root.add(tree)
-            
+
             return root
 
 
@@ -410,10 +412,13 @@ if __name__ == "__main__":
     # printGotos(gotos)
     input.close()
 
-    input = tape
+    print(tape)
 
-    parse_tree = parse(input, grammar, actions, gotos)
+    parse_tree = parse(tape, grammar, actions, gotos)
 
-    print('\n',type(parse_tree),'\n')
-
-    parse_tree.print()
+    if parse_tree:
+        print("Input is syntactically correct!")
+        print("Parse Tree:")
+        parse_tree.print()
+    else:
+        print("Code has syntax errors!")
