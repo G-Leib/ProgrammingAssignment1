@@ -222,7 +222,7 @@ def lex(input):
             return (input, lexeme, lookupToken[lexeme])
         return (input, lexeme, lookupToken[lexeme])
 
-    raise Exception("Lexical Analyzer Error: unrecognized symbol ( {} ) was found!".format(lexeme))
+    raise Exception("{} on symbol {}".format(errorMessage(3), lexeme))
 
 def loadGrammar(input):
     grammar = []
@@ -355,10 +355,10 @@ if __name__ == "__main__":
 
     
     if len(sys.argv) != 2:
-        raise ValueError("Missing source file")
+        raise Exception(errorMessage(1))
     source = open(sys.argv[1], "rt")
     if not source:
-        raise IOError("Couldn't open source file")
+        raise IOError(errorMessage(2))
     
     input = source.read()
     source.close()
@@ -387,12 +387,18 @@ if __name__ == "__main__":
     for (lexeme, token) in output:
         print(lexeme, '\t', token)
 
-    input = open("grammar.txt", "rt")
+    try:
+        input = open("grammar.txt", "rt")
+    except Exception:
+        raise IOError(errorMessage(4))
     grammar = loadGrammar(input)
     # printGrammar(grammar)
     input.close()
 
-    input = open("slr_table.txt", "rt")
+    try:
+        input = open("slr_table.txt", "rt")
+    except Exception:
+        raise IOError(errorMessage(5))
     actions, gotos = loadTable(input)
     # printActions(actions)
     # printGotos(gotos)
@@ -407,4 +413,4 @@ if __name__ == "__main__":
     if prs:
         print("Input is syntactically correct!")
     else:
-        print("There is a syntax error!")
+        raise Exception(errorMessage(99))
