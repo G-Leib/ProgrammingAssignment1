@@ -7,8 +7,6 @@
 import sys
 from enum import Enum
 
-grammarInput = []
-
 class CharClass(Enum):
     EOF        = 1
     LETTER     = 2
@@ -206,8 +204,7 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT:
                 break
-        grammarInput.append("l")
-        return (input, lexeme, tokens.LITERAL)
+        return (input, lexeme, Token.INTEGER_LITERAL)
 
     if charClass == CharClass.OPERATOR:
         input, lexeme = addChar(input, lexeme)
@@ -335,6 +332,7 @@ def parse(input, grammar, actions, gotos):
             trees.append(newTree)
 
         elif action == 'acc':
+            print ('\naction:\t', action, '\n')
             return True
 
         else:
@@ -346,6 +344,8 @@ def parse(input, grammar, actions, gotos):
             root.data = lhs
             for tree in trees:
                 root.add(tree)
+            
+            print ('\naction:\t', action, '\n')
 
             return root
 
@@ -369,36 +369,41 @@ if __name__ == "__main__":
     while True:
         input, lexeme, token = lex(input)
         if lexeme == None:
+            tape.append("$")
             break
 
         
         if token == Token.IDENTIFIER:
-            tape.append('i')
+            lexeme = 'i'
         elif token == Token.INTEGER_LITERAL:
-            tape.append('l')
-        else:
-            tape.append(lexeme)
+            lexeme = 'l'
+        
+        tape.append(lexeme)
         
         tokens.append(token)
-        output.append([lexeme, token, tape[-1]])
+        output.append([lexeme, token])
 
-    for (lexeme, token, tape_token) in output:
-        print(token, '\t', lexeme, '\t', tape_token)
+    for (lexeme, token) in output:
+        print(lexeme, '\t', token)
 
     input = open("grammar.txt", "rt")
     grammar = loadGrammar(input)
-    #printGrammar(grammar)
+    # printGrammar(grammar)
     input.close()
 
     input = open("slr_table.txt", "rt")
     actions, gotos = loadTable(input)
-    #printActions(actions)
-    #printGotos(gotos)
+    # printActions(actions)
+    # printGotos(gotos)
     input.close()
 
     input = tape
 
-    if parse(input, grammar, actions, gotos):
+    prs = parse(input, grammar, actions, gotos)
+
+    print('\n',type(prs),'\n')
+
+    if prs:
         print("Input is syntactically correct!")
     else:
         print("There is a syntax error!")
