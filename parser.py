@@ -193,6 +193,7 @@ def lex(input):
                 break
 
 
+
         if lexeme.lower() in lookupToken.keys():
             return (input, lexeme, lookupToken[lexeme.lower()])
         else:
@@ -255,6 +256,7 @@ def loadTable(input):
     for line in input:
         row = line.strip().split(",")
         state = int(row[0])
+        # print("state: " + str(state))
         for i in range(len(tokens)):
             token = tokens[i]
             key = (state, token)
@@ -264,6 +266,7 @@ def loadTable(input):
             actions[key] = value
         for i in range(len(variables)):
             variable = variables[i]
+            #print("variable: " + variable)
             key = (state, variable)
             value = row[i + len(tokens) + 1]
             if len(value) == 0:
@@ -284,9 +287,21 @@ def printGotos(gotos):
 
 
 # TODO: fill complete conditions for remaining syntax errors: 7, 8, 9, 10, 11
-def handle_syntax_error(stack, input):
+def handle_syntax_error(stack, state, input):
     if stack[-2] == '.' and input[0] != '$':
         raise Exception(errorMessage(6))
+    elif stack[-2] == 'program' and input[0] != 'i':
+        raise Exception(errorMessage(7))
+    elif stack[-2] == ';' and input[0] != "read":
+        raise Exception(errorMessage(8))
+    elif state == 25 and input[0] not in lookupToken.keys():
+        raise Exception(errorMessage(9))
+    elif state == 46 and input[0] != CharClass.OPERATOR:
+        raise Exception(errorMessage(9))
+    elif state == 31 and input[0] not in {'integer', 'boolean'}:
+        raise Exception(errorMessage(10))
+    elif state == 35 and input[0] not in {'id', 'integer_literal', 'true', 'false'}:
+        raise Exception(errorMessage(11))
     else:
         raise Exception(errorMessage(99))
 
@@ -297,18 +312,20 @@ def parse(input, grammar, actions, gotos):
     stack = []
     stack.append(0)
     while True:
-        print("stack: ", end = "")
-        print(stack, end = " ")
-        print("input: ", end = "")
-        print(input, end = " ")
+        #print("stack: ", end = "")
+        #print(stack, end = " ")
+        #print("input: ", end = "")
+        #print(input, end = " ")
         state = stack[-1]
+        print("state: " + str(state))
         token = input[0]
+        print("token: " + token)
         action = actions[(state, token)]
-        print("action: ", end = "")
-        print(action)
+        #print("action: ", end = "")
+        #print(action)
 
         if action is None:
-            handle_syntax_error(stack, input)
+            handle_syntax_error(stack, state, input)
 
 
         if action[0] == 's':
@@ -340,10 +357,6 @@ def parse(input, grammar, actions, gotos):
             trees = trees[:-len(rhs)]
 
             trees.append(newTree)
-
-#        elif action == 'acc':
-#            print(tree.data + " action elif")
-#            return tree
 
         else:
             production = grammar[0]
