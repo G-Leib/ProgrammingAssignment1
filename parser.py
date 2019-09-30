@@ -283,17 +283,17 @@ def printGotos(gotos):
         print(gotos[key])
 
 
-# TODO: fill complete conditions for remaining syntax errors: 8, 9,
+# TODO: fill complete conditions for remaining syntax errors:
 def handle_syntax_error(stack, state, input):
     if stack[-2] == '.' and input[0] != '$':
         raise Exception(errorMessage(6))
     elif stack[-2] == 'program' and input[0] != 'i':
         raise Exception(errorMessage(7))
-    elif stack[-2] == ';' and input[0] != "read":
+    elif input[0] == 'i' and stack[-2] not in {'var', 'read', 'write', 'while', 'do', 'if', 'begin', 'end'}:
         raise Exception(errorMessage(8))
-    elif stack[-2] == 'i' and input[0] != ':=':
+    elif stack[-2] == 'i' and input[0] not in {':='}:
         raise Exception(errorMessage(9))
-    elif 'while' in stack and input[0] not in {'>', '<', '<=', '>=', '='}:
+    elif stack[-4] == 'while' in stack and input[0] not in {'>', '<', '<=', '>=', '='}:
         raise Exception(errorMessage(9))
     elif 'var' in stack and input[0] not in {'integer', 'boolean'}:
         raise Exception(errorMessage(10))
@@ -414,7 +414,7 @@ if __name__ == "__main__":
     input.close()
 
     try:
-        input = open("slr_table.txt", "rt")
+        input = open("slr_table.csv", "rt")
     except Exception:
         raise IOError(errorMessage(5))
     actions, gotos = loadTable(input)
