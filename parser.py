@@ -291,9 +291,9 @@ def handle_syntax_error(stack, state, input):
         raise Exception(errorMessage(7))
     elif stack[-2] == ';' and input[0] != "read":
         raise Exception(errorMessage(8))
-    elif state == 25 and input[0] not in lookupToken.keys():
+    elif stack[-2] == 'i' and input[0] != ':=':
         raise Exception(errorMessage(9))
-    elif state == 46 and input[0] != CharClass.OPERATOR:
+    elif 'while' in stack and input[0] not in {'>', '<', '<=', '>=', '='}:
         raise Exception(errorMessage(9))
     elif 'var' in stack and input[0] not in {'integer', 'boolean'}:
         raise Exception(errorMessage(10))
