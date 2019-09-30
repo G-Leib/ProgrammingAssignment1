@@ -191,9 +191,6 @@ def lex(input):
             c, charClass = getChar(input)
             if charClass != CharClass.DIGIT and charClass != CharClass.LETTER:
                 break
-
-
-
         if lexeme.lower() in lookupToken.keys():
             return (input, lexeme, lookupToken[lexeme.lower()])
         else:
@@ -286,7 +283,7 @@ def printGotos(gotos):
         print(gotos[key])
 
 
-# TODO: fill complete conditions for remaining syntax errors: 7, 8, 9, 10, 11
+# TODO: fill complete conditions for remaining syntax errors: 8, 9,
 def handle_syntax_error(stack, state, input):
     if stack[-2] == '.' and input[0] != '$':
         raise Exception(errorMessage(6))
@@ -298,9 +295,9 @@ def handle_syntax_error(stack, state, input):
         raise Exception(errorMessage(9))
     elif state == 46 and input[0] != CharClass.OPERATOR:
         raise Exception(errorMessage(9))
-    elif state == 31 and input[0] not in {'integer', 'boolean'}:
+    elif 'var' in stack and input[0] not in {'integer', 'boolean'}:
         raise Exception(errorMessage(10))
-    elif state == 35 and input[0] not in {'id', 'integer_literal', 'true', 'false'}:
+    elif stack[-2] == ':=' and input[0] not in {'i', 'int_l', 'true', 'false'}:
         raise Exception(errorMessage(11))
     else:
         raise Exception(errorMessage(99))
@@ -312,17 +309,17 @@ def parse(input, grammar, actions, gotos):
     stack = []
     stack.append(0)
     while True:
-        #print("stack: ", end = "")
-        #print(stack, end = " ")
-        #print("input: ", end = "")
-        #print(input, end = " ")
+        print("stack: ", end = "")
+        print(stack, end = " ")
+        print("input: ", end = "")
+        print(input, end = " ")
         state = stack[-1]
-        print("state: " + str(state))
+        # print("state: " + str(state))
         token = input[0]
-        print("token: " + token)
+        # print("token: " + token)
         action = actions[(state, token)]
-        #print("action: ", end = "")
-        #print(action)
+        print("action: ", end = "")
+        print(action)
 
         if action is None:
             handle_syntax_error(stack, state, input)
@@ -435,3 +432,5 @@ if __name__ == "__main__":
         parse_tree.print()
     else:
         print("Code has syntax errors!")
+
+    print([(getLHS(g), getRHS(g)) for g in grammar])
